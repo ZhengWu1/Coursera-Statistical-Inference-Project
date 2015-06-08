@@ -1,0 +1,50 @@
+---
+title: "Exponential Distribution Simulation"
+author: "Zheng Wu"
+date: "June 7, 2015"
+output: pdf_document
+---
+
+###Overview
+This report shows the sample mean of 40 exponentials and compare it to the theoretical mean of the distribution. It also shows how variable the sample is (via variance) and compare it to the theoretical variance of the distribution. Finally it shows that the distribution is approximately normal.  
+<br>
+
+loading required libraries and set random seed
+```{r, message=FALSE}
+library(gridExtra)
+library(ggplot2)
+set.seed(1024)
+```  
+<br>
+
+Take the means of 40 random exponentials and do the simulation 1000 times
+```{r}
+lambda = 0.2
+means <- apply(matrix(rexp(n = 1000*40, lambda), 1000, 40), 1, mean) 
+```
+<br>
+
+###Sample mean vs theoretical mean
+```{r, fig.height= 4}
+ggplot(data.frame(means = means), aes(x = means)) + geom_histogram(binwidth = 0.2, fill = "red", aes(y=..density..)) + geom_vline(x = 1/lambda) + geom_vline(x = mean(means), col = "blue") + xlab("value") + labs(title = "Histogram of 1000 Averages of 40 Exponentials") 
+```
+<br>
+Sample mean = `r mean(means)` and is denoted as the blue line in the figure and theoretical mean = `r 1/lambda` and is denotes as the black line in the figure
+<br>
+
+###Sample variance vs theoretical variance
+```{r}
+ggplot(data.frame(means = means), aes(x = means)) + geom_histogram(binwidth = 0.2, fill = "red", aes(y=..density..)) + geom_vline(x = 1/lambda, linetype = 2) + geom_vline(x = 1/lambda + 1/lambda/sqrt(40)) + geom_vline(x = 1/lambda - 1/lambda/sqrt(40)) + geom_vline(x = mean(means), col = "blue", linetype = 2) + geom_vline(x = mean(means) + sd(means), col = "blue") + geom_vline(x = mean(means) - sd(means), col = "blue") + xlab("value") + labs(title = "Histogram of 1000 Averages of 40 Exponentials")
+```
+<br>
+One sample standard deviation = `r sd(means)` (variance = `r sd(means)^2`) away from the sample mean(blue dashed line) is denoted as the blue solid lines in the figure and one theoretical standard deviation = `r 1/lambda/sqrt(40)` (variance = `r (1/lambda/sqrt(40))^2`) away from the theoretical mean(black dashed line) is denoted as the black solid lines in the figure
+<br>
+
+###Compare the plot of Histogram of 1000 Exponentials vs Histogram of 1000 Averages of 40 Exponentials
+```{r}
+plot1 <- ggplot(data.frame(exps = rexp(1000, lambda)), aes(x = exps)) + geom_histogram(fill = "blue") + xlab("value") + labs(title = "Histogram of 1000 Exponentials")
+plot2 <- ggplot(data.frame(means = means), aes(x = means)) + geom_histogram(binwidth = 0.2, fill = "red", aes(y=..density..)) + xlab("value") + labs(title = "Histogram of 1000 Averages of 40 Exponentials") + stat_function(fun=dnorm, args=list(1/lambda, sd=1/lambda/sqrt(40)))
+grid.arrange(plot1, plot2)
+```
+<br>
+The solid black lines overlayed on top of the red histogram is the theoretical normal distribution. We can see clearly that the sampling distribution is approximately normally distributed. 

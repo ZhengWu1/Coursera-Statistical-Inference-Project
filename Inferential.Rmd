@@ -1,0 +1,56 @@
+---
+title: "Inferential Data Analysis"
+author: "Zheng Wu"
+date: "June 7, 2015"
+output: pdf_document
+---
+
+###Load the ToothGrowth data and perform some basic exploratory data analyses.
+```{r, message=FALSE}
+library(datasets)
+library(ggplot2)
+library(gridExtra)
+data <- ToothGrowth
+plot1 <- ggplot(data, aes(x = len)) + geom_histogram() + facet_grid(.~supp) + labs(title = "Histogram of len by supp")
+plot2 <- ggplot(data, aes(x = len)) + geom_histogram() + facet_grid(.~dose) + labs(title = "Histogram of len by dose")
+grid.arrange(plot1, plot2)
+```
+
+###Provide a basic summary of the data.
+```{r}
+summary(data)
+```
+###Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose.
+
+####By supp OJ vs VC
+```{r}
+lOJ <- data$len[data$supp == "OJ"]
+lVC <- data$len[data$supp == "VC"]
+t.test(lOJ,lVC, alternative = "greater")
+```
+Since the p value of the one sided t-test is smaller that the 0.05 alpha threshould, I would reject the null hypothesis that the true difference in means in the two groups is 0 in favor of the alternative hypothesis that the true difference in means is greater than 0.
+
+####By dose 0.5 vs 1
+```{r}
+l0.5 <- data$len[data$dose == 0.5]
+l1 <- data$len[data$dose == 1]
+t.test(l0.5,l1, alternative = "less")
+```
+Since the p value of the one sided t-test is smaller that the 0.05 alpha threshould, I would reject the null hypothesis that the true difference in means in the two groups is 0 in favor of the alternative hypothesis that the true difference in means is less than 0.
+
+####By dose 1 vs 2
+```{r}
+l2 <- data$len[data$dose == 2]
+t.test(l1,l2, alternative = "less")
+```
+Since the p value of the one sided t-test is smaller that the 0.05 alpha threshould, I would reject the null hypothesis that the true difference in means in the two groups is 0 in favor of the alternative hypothesis that the true difference in means is less than 0.
+
+####By dose 0.5 vs 2
+```{r}
+t.test(l0.5,l2, alternative = "less")
+```
+Since the p value of the one sided t-test is smaller that the 0.05 alpha threshould, I would reject the null hypothesis that the true difference in means in the two groups is 0 in favor of the alternative hypothesis that the true difference in means is less than 0.
+
+###Assumptions needed for all the above conclusions:
+1.Each of the two populations being compared should follow a normal distribution.
+2.The data used to carry out the test should be sampled independently and randomly from the two populations being compared.
